@@ -2,32 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background: 222.2 84% 4.9%; /* Light background color */
+    --foreground: 210 40% 98%; /* Light foreground color */
+
+    --card: 222.2 84% 4.9%; /* Light card background color */
+    --card-foreground: 210 40% 98%; /* Light card foreground color */
+
+    --popover: 222.2 84% 4.9%; /* Light popover background color */
+    --popover-foreground: 210 40% 98%; /* Light popover foreground color */
+
+    --primary: 210 40% 98%; /* Light primary color */
+    --primary-foreground: 222.2 47.4% 11.2%; /* Dark primary foreground color */
+
+    --secondary: 217.2 32.6% 17.5%; /* Dark secondary color */
+    --secondary-foreground: 210 40% 98%; /* Light secondary foreground color */
+
+    --muted: 217.2 32.6% 17.5%; /* Dark muted color */
+    --muted-foreground: 215 20.2% 65.1%; /* Dark muted foreground color */
+
+    --accent: 217.2 32.6% 17.5%; /* Dark accent color */
+    --accent-foreground: 210 40% 98%; /* Light accent foreground color */
+
+    --destructive: 0 62.8% 30.6%; /* Dark destructive color */
+    --destructive-foreground: 210 40% 98%; /* Light destructive foreground color */
+
+    --border: 217.2 32.6% 17.5%; /* Dark border color */
+    --input: 217.2 32.6% 17.5%; /* Dark input color */
+    --ring: 212.7 26.8% 83.9%; /* Dark ring color */
+
+    --radius: 0.5rem; /* Border radius */
+  }
+
+  .dark {
+    --background: 0 0% 100%; /* Dark background color */
+    --foreground: 222.2 84% 4.9%; /* Light foreground color */
+
+    --card: 0 0% 100%; /* Dark card background color */
+    --card-foreground: 222.2 84% 4.9%; /* Light card foreground color */
+
+    --popover: 0 0% 100%; /* Dark popover background color */
+    --popover-foreground: 222.2 84% 4.9%; /* Light popover foreground color */
+
+    --primary: 222.2 47.4% 11.2%; /* Light primary color */
+    --primary-foreground: 210 40% 98%; /* Light primary foreground color */
+
+    --secondary: 210 40% 96.1%; /* Light secondary color */
+    --secondary-foreground: 222.2 47.4% 11.2%; /* Dark secondary foreground color */
+
+    --muted: 210 40% 96.1%; /* Light muted color */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Light muted foreground color */
+
+    --accent: 210 40% 96.1%; /* Light accent color */
+    --accent-foreground: 222.2 47.4% 11.2%; /* Dark accent foreground color */
+
+    --destructive: 0 84.2% 60.2%; /* Light destructive color */
+    --destructive-foreground: 210 40% 98%; /* Light destructive foreground color */
+
+    --border: 214.3 31.8% 91.4%; /* Light border color */
+    --input: 214.3 31.8% 91.4%; /* Light input color */
+    --ring: 222.2 84% 4.9%; /* Light ring color */
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

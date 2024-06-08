@@ -1,0 +1,10 @@
+.question-page-container {
+    display: flex;
+  }
+  
+  .code-editor-container {
+    flex-grow: 1; /* This will make the CodeEditor take up remaining space */
+    display: flex;
+    justify-content: flex-end; /* Align CodeEditor to the right */
+  }
+  
