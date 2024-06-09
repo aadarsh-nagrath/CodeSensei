@@ -24,13 +24,13 @@ const CodeEditor = () => {
       <div>
       <LanguageSelector language={language} languageSelect={languageSelect} />
       <Editor
-        height="80vh"
+        height="90%"
         width="90vh"
         theme="vs-dark"
         language={language}
         onMount={editorOnMount}
         defaultValue={
-          "// Happy Coding! " +
+          "// Happy Coding!" +
           CODE_SNIPPETS[language as keyof typeof CODE_SNIPPETS].replace(
             /\n/g,
             "\n"

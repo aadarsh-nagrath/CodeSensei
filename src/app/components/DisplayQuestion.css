@@ -1,0 +1,61 @@
+/* DisplayQuestion.css */
+.question-container {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  font-family: 'Arial', sans-serif;
+  overflow-x: auto; /* Add horizontal scrollbar */
+  width: 100vw; /* Set width to screen width */
+}
+  
+  .question-name {
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .question-description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  .question-subheading {
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .question-constraints {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  .test-case {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background-color: #fff;
+  }
+  
+  .test-case h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .test-case-input,
+  .test-case-output {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .nested-item {
+    margin-left: 20px;
+  }
+  

@@ -56,7 +56,7 @@ const Output = ({
   };
 
   const ahead = async () => {
-    const qid = await getNextQuestion();
+    const { qid } = await getNextQuestion();
     router.push(`/question/${qid}`);
   };
 
@@ -64,12 +64,12 @@ const Output = ({
     <div className="z-10">
       <Sheet>
         <SheetTrigger asChild>
-          <Button className='' variant="outline"   style={{position: 'fixed', bottom: '20px', right: '10%',transform: 'translateX(-50%)'}} onClick={runcode} disabled={isLoading}>
+          <Button className='' variant="destructive"   style={{position: 'fixed', bottom: '20px', right: '10%',transform: 'translateX(-50%)'}} onClick={runcode} disabled={isLoading}>
             {isLoading ? "Running..." : "Run Code"}
           </Button>
         </SheetTrigger>
         {/* Generator Function */}
-        <Button style={{position: 'fixed', bottom: '20px', right: '5%',transform: 'translateX(-50%)'}} variant="outline" onClick={ahead}>
+        <Button style={{position: 'fixed', bottom: '20px', right: '5%',transform: 'translateX(-50%)'}} variant="green" onClick={ahead}>
           NEXT
         </Button>
         <SheetContent side={'left'} className="w-[50%] sm:w-[540px] bg-[#1e1e1e]">

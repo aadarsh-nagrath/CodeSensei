@@ -1,12 +1,17 @@
 import axios from "axios";
 import { Language_versions } from "./constant";
-import { useRouter } from "next/router";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Ensure environment variables are loaded
 if (typeof window === 'undefined') {
   require('dotenv').config();
 }
+
+interface EnhancedGenerateContentResponse {
+  qname: string;
+  description: string;
+}
+
 
 const API = axios.create({
   baseURL: "https://emkc.org/api/v2/piston",
@@ -16,7 +21,7 @@ const genAI = new GoogleGenerativeAI(
   process.env.NEXT_PUBLIC_GENAI_API_KEY || ""
 );
 
-const interestArray = ["spiderman", "batman and joker", "sucide squad", "doraemon", "attack on titans"];
+const interestArray = ["spiderman", "batman and joker", "suicide squad", "doraemon", "attack on titans"];
 
 const getRandomValue = (array: Array<string>) => {
   const randomIndex = Math.floor(Math.random() * array.length);
@@ -34,50 +39,101 @@ export const executeCode = async (
   language: keyof typeof Language_versions,
   sourceCode: string
 ) => {
-  const response = await API.post("/execute", {
-    language: language,
-    version: Language_versions[language],
-    files: [
-      {
-        content: sourceCode,
-      },
-    ],
-  });
-  return response.data;
+  try {
+    const response = await API.post("/execute", {
+      language: language,
+      version: Language_versions[language],
+      files: [
+        {
+          content: sourceCode,
+        },
+      ],
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error executing code:", error);
+    throw error;
+  }
 };
 
-async function newQuestion(topic: string) {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-  const prompt = `Build me an innovative, never created before DSA question just like in leetcode, the question should be related to ${topic}, also give two example test cases for the question, constraints, description, Qname, provide answer only in json format directly starting from "{" to "}" nothing else`;
-
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  let text = await response.text();
-  // Check if response is not JSON
+function convertToJsonAndLog(text: string): EnhancedGenerateContentResponse | null {
+  // Check if the text contains a JSON object
   if (!text.startsWith('{')) {
-    console.log(text);
+    // Extract the JSON part from the response
+    const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+
+    // Parse the JSON string to a JavaScript object
+    const jsonObject = JSON.parse(jsonString);
+
+    // Log the JavaScript object
+    console.log('Parsed JSON object:', jsonObject);
+
+    return jsonObject;
+  } else {
+    // If it already starts with '{', just parse and log it
+    const jsonObject = JSON.parse(text);
+    console.log('Parsed JSON object:', jsonObject);
+    return jsonObject;
+  }
+}
+
+async function newQuestion(topic: string) {
+  try {
+    // The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `Build me a innovative, never created before DSA question just like in leetcode, the question should be related to ${topic}, also give two example test cases for the question(example_test_cases), constraints, description, question name (qname), provide answer only in json format (keys in lowercase) directly starting from "{" to "}" nothing else, order of keys -> qname, description, constriants, example_test_cases`;
+
+    const result = await model.generateContent(prompt);
+    if (!result || !result.response) {
+      throw new Error("Invalid response from generateContent");
+    }
+
+    const response = result.response;
+    const text = await response.text();
+
+    // Check if response is not JSON
+    if (!text.startsWith("{")) {
+      console.log("Non-JSON response:", text);
+      const jsonObject = convertToJsonAndLog(text);
+      return jsonObject;
+    }
+
+    // Remove first and last lines
+    const jsonData = text.substring(
+      text.indexOf("{"),
+      text.lastIndexOf("}") + 1
+    );
+    const questionData = JSON.parse(jsonData);
+
+    console.log("Parsed question data:", questionData);
+
+    return questionData;
+  } catch (error) {
+    console.error("Error generating new question:", error);
+    getNextQuestion();
     return null;
   }
-  // Remove first and last lines
-  text = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-  console.log(JSON.parse(text));
-  return JSON.parse(text);
 }
+
 
 // API for next Question
 export const getNextQuestion = async () => {
   const num = Math.floor(Math.random() * 10) + 1;
   if (num < 2) {
-    // popular Question
+    // Handle popular question scenario
   } else {
     const qid = generateUniqueId();
     const interest = getRandomValue(interestArray);
     const questionData = await newQuestion(interest);
 
     // POST the generated question data to `/question/${qid}`
-    await axios.post(`/question/${qid}`, questionData);
-
-    return qid;
+    try {
+      await axios.post(`/question/${qid}`, questionData);
+      return { qid, questionData };
+    } catch (error) {
+      console.error("Error posting question data:", error);
+      throw error;
+    }
   }
 };
