@@ -13,7 +13,7 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
   const router = useRouter();
 
   const getStarted = () => {
-    router.push('/question');
+    router.push('/question/1');
   };
 
   return (

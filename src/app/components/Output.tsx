@@ -1,6 +1,7 @@
+"use client";
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { executeCode } from '../api';
+import { executeCode, getNextQuestion } from '../api';
 import { toast } from "sonner";
 import {
   Sheet,
@@ -12,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useRouter } from 'next/navigation';
 
 const Output = ({
   language,
@@ -23,6 +25,7 @@ const Output = ({
   const [output, setOutput] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const router = useRouter();
 
   const runcode = async () => {
     const sourceCode = editorRef.current.getValue();
@@ -52,6 +55,11 @@ const Output = ({
     }
   };
 
+  const ahead = async () => {
+    const qid = await getNextQuestion();
+    router.push(`/question/${qid}`);
+  };
+
   return (
     <div className="z-10">
       <Sheet>
@@ -61,7 +69,7 @@ const Output = ({
           </Button>
         </SheetTrigger>
         {/* Generator Function */}
-        <Button style={{position: 'fixed', bottom: '20px', right: '5%',transform: 'translateX(-50%)'}} variant="outline" onClick={() => {}}>
+        <Button style={{position: 'fixed', bottom: '20px', right: '5%',transform: 'translateX(-50%)'}} variant="outline" onClick={ahead}>
           NEXT
         </Button>
         <SheetContent side={'left'} className="w-[50%] sm:w-[540px] bg-[#1e1e1e]">
