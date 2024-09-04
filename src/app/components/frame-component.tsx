@@ -123,7 +123,7 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
               Instant setup, no custom code
             </h1>
             <p className="m-0 self-stretch relative text-lg leading-[18px] text-dark-minor">
-              Invite the bot, pick a channel, and you're set—no custom code
+              Invite the bot, pick a channel, and you&apos;re set—no custom code
               needed, and no vendor lock-in.
             </p>
             <img

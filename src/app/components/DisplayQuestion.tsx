@@ -2,8 +2,8 @@ import React from 'react';
 import './DisplayQuestion.css';
 
 interface ExampleTestCase {
-  input: any; // Can be any JSON structure
-  output: any; // Can be any JSON structure
+  input: any;
+  output: any;
 }
 
 interface QuestionData {
@@ -38,13 +38,23 @@ const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question }) => {
     return renderNestedInput(input, 0);
   };
 
-  const renderConstraints = (constraints: { [key: string]: string } | undefined) => {
+  // Function to format constraints into a readable string
+  const formatConstraints = (constraints: { [key: string]: string } | undefined): string | undefined => {
+    if (!constraints) return undefined;
+
+    return Object.entries(constraints)
+      .map(([key, value]) => `${value}`)
+      .join('');
+  };
+
+  // Render constraints as a formatted string
+  const renderConstraints = (constraints: string | undefined) => {
     if (!constraints) return null;
 
     return (
       <div className="question-constraints">
         <h3 className="question-subheading">Constraints:</h3>
-          <p className="constraint">{question.constraints}</p>
+        <p className="constraint">{constraints}</p>
       </div>
     );
   };
@@ -53,7 +63,7 @@ const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question }) => {
     <div className="question-container">
       <h1 className="question-name">{question.qname}</h1>
       <p className="question-description">{question.description}</p>
-      {renderConstraints(question.constraints)}
+      {renderConstraints(formatConstraints(question.constraints))}
       {question.example_test_cases.map((testCase, index) => (
         <div key={index} className="test-case">
           <h3 className="question-subheading">Test Case {index + 1}</h3>

@@ -12,7 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 import { useRouter } from 'next/navigation';
 
 const Output = ({
@@ -56,20 +56,26 @@ const Output = ({
   };
 
   const ahead = async () => {
-    const { qid } = await getNextQuestion();
-    router.push(`/question/${qid}`);
+    const nextQuestion = await getNextQuestion();
+    if (nextQuestion?.qid) {
+      router.push(`/question/${nextQuestion.qid}`);
+    } else {
+      toast("Unable to get the next question", {
+        description: "Please try again later.",
+        duration: 1500,
+      });
+    }
   };
 
   return (
     <div className="z-10">
       <Sheet>
         <SheetTrigger asChild>
-          <Button className='' variant="destructive"   style={{position: 'fixed', bottom: '20px', right: '10%',transform: 'translateX(-50%)'}} onClick={runcode} disabled={isLoading}>
+          <Button className='' variant="destructive" style={{position: 'fixed', bottom: '20px', right: '10%', transform: 'translateX(-50%)'}} onClick={runcode} disabled={isLoading}>
             {isLoading ? "Running..." : "Run Code"}
           </Button>
         </SheetTrigger>
-        {/* Generator Function */}
-        <Button style={{position: 'fixed', bottom: '20px', right: '5%',transform: 'translateX(-50%)'}} variant="green" onClick={ahead}>
+        <Button style={{position: 'fixed', bottom: '20px', right: '5%', transform: 'translateX(-50%)'}} variant="green" onClick={ahead}>
           NEXT
         </Button>
         <SheetContent side={'left'} className="w-[50%] sm:w-[540px] bg-[#1e1e1e]">
@@ -100,7 +106,7 @@ const Output = ({
           <div className="grid gap-4 py-4"></div>
           <SheetFooter>
             <SheetClose asChild>
-            <Button type="submit" >Save changes</Button>
+              <Button type="submit">Save changes</Button>
             </SheetClose>
           </SheetFooter>
         </SheetContent>

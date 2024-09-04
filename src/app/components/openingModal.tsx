@@ -83,7 +83,7 @@ const CustomDialog = ({
                   </CardDescription>
                   <CardDescription>
                     Let me give you an example of how cool it can get. Type any
-                    anime name you like, for example, "Death Note".
+                    anime name you like, for example, &quot;Death Note&quot;.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -102,7 +102,7 @@ const CustomDialog = ({
                 <CardHeader>
                   <CardTitle>Log In / Create Account</CardTitle>
                   <CardDescription>
-                    Login or Register here. Click "Create/Login" when you're
+                    Login or Register here. Click &quot;Create/Login&quot; when you&apos;re
                     done.
                   </CardDescription>
                 </CardHeader>

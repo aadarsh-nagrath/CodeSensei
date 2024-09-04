@@ -82,7 +82,7 @@ async function newQuestion(topic: string) {
     // The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = `Build me a innovative, never created before DSA question just like in leetcode, the question should be related to ${topic}, also give two example test cases for the question(example_test_cases), constraints, description, question name (qname), provide answer only in json format (keys in lowercase) directly starting from "{" to "}" nothing else, order of keys -> qname, description, constriants, example_test_cases`;
+    const prompt = `Build me a innovative, never created before DSA question just like in leetcode, the question should be related to ${topic}, also give two example test cases for the question(example_test_cases), constraints, description, question name (qname), provide answer only in json format (keys in lowercase) directly starting from "{" to "}" nothing else, order of keys -> qname, description, constriants, example_test_cases. Make sure the test cases and are correct properly`;
 
     const result = await model.generateContent(prompt);
     if (!result || !result.response) {
