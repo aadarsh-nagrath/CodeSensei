@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import axios from 'axios';
 import {
   Card,
   CardContent,
@@ -34,6 +35,24 @@ const CustomDialog = ({
   onClose: () => void;
 }) => {
   const [activeTab, setActiveTab] = useState("intro");
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('/api/login', { username, password });
+
+      if (response.data.success) {
+        setLoggedInUser(response.data.username);
+        setError("");
+      }
+    } catch (err) {
+      setError('Invalid login credentials');
+    }
+  };
 
   const handleStart = () => {
     const inputElement = document.getElementById(
@@ -109,15 +128,27 @@ const CustomDialog = ({
                 <CardContent className="space-y-2">
                   <div className="space-y-1">
                     <Label htmlFor="current">Username</Label>
-                    <Input id="uname" type="name" />
+                    <Input
+                      placeholder="Username"
+                      value={username}
+                      id="uname" type="name" 
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor="new">Password</Label>
-                    <Input id="pass" type="password" />
+                    <Input
+                      type="password"
+                      placeholder="Password"
+                      id="pass"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button>Create/Login</Button>
+                  <Button onClick={handleLogin}>Create/Login</Button>
+                  {error && <p>{error}</p>}
                 </CardFooter>
               </Card>
             </TabsContent>

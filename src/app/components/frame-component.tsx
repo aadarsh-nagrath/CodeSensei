@@ -1,5 +1,7 @@
 "use client";
-
+import { useState, useEffect } from 'react';
+import { parseCookies } from 'nookies'; // Add nookies to handle cookies in Next.js
+import axios from 'axios';
 import type { NextPage } from "next";
 import Feature from "./feature";
 import Link from "next/link";
@@ -15,6 +17,20 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
   const getStarted = () => {
     router.push('/question/1');
   };
+
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cookies = parseCookies();
+    const token = cookies.token;
+
+    if (token) {
+      // Verify token and extract username
+      axios.post('/api/verify-token', { token }).then((res) => {
+        setUsername(res.data.username);
+      });
+    }
+  }, []);
 
   return (
     <section
@@ -51,6 +67,17 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
               Contact Us
             </a>
           </div>
+
+            {/* CHECKING SESSION */}
+
+          {username ? (
+          <p>Welcome, {username}</p>
+        ) : (
+          <div className="login-buttons">
+            <a href="/login">Login</a>
+            <button>Sign Up</button>
+          </div>
+        )}
 
 
           {/* LOGIN BUTTONS */}
