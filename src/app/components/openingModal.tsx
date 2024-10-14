@@ -3,11 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Card,
@@ -48,6 +44,35 @@ const CustomDialog = ({
       }
     }
   };
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+  
+      if (!res.ok) {
+        const errorData = await res.text();
+        console.error('Error response:', errorData);
+        throw new Error('An error occurred: ' + errorData);
+      }
+  
+      const data = await res.json();
+      onClose();
+      // Handle successful login (e.g., store token, redirect, etc.)
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -102,22 +127,23 @@ const CustomDialog = ({
                 <CardHeader>
                   <CardTitle>Log In / Create Account</CardTitle>
                   <CardDescription>
-                    Login or Register here. Click &quot;Create/Login&quot; when you&apos;re
+                    Login or Register here. Click "Create/Login" when you're
                     done.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="space-y-1">
                     <Label htmlFor="current">Username</Label>
-                    <Input id="uname" type="name" />
+                    <Input id="uname" value={username} onChange={(e)=>setUsername(e.target.value)} type="name" />
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor="new">Password</Label>
-                    <Input id="pass" type="password" />
+                    <Input id="pass" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} />
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button>Create/Login</Button>
+                  <Button onClick={handleSubmit} >Create/Login</Button>
+                  {/* {message && <p>{message}</p>} */}
                 </CardFooter>
               </Card>
             </TabsContent>
@@ -130,5 +156,4 @@ const CustomDialog = ({
     </Dialog>
   );
 };
-
 export default CustomDialog;
