@@ -10,8 +10,35 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {useState } from "react"
 
 const GenereDialog = () => {
+  const [interest, setInterest] = useState('');
+  const handleInterest = async () => {
+    try {
+      console.log('Sending interest:', interest); // Log the interest being sent
+      const res = await fetch('/interests/topic', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ interest }),
+      });
+  
+      if (!res.ok) {
+        const errorData = await res.text();
+        console.error('Error response:', errorData);
+        throw new Error('An error occurred: ' + errorData);
+      }
+  
+      const data = await res.json();
+      console.log('Server response:', data);
+    } catch (error) {
+      console.error('Error in handleInterest:', error);
+    }
+  };
+  
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -35,12 +62,14 @@ const GenereDialog = () => {
             </Label>
             <Input
               id="username"
+              value={interest}
+              onChange={(e) => setInterest(e.target.value)}
               className="col-span-3"
             />
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">Go for it</Button>
+          <Button onClick={handleInterest} type="submit">Go for it</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

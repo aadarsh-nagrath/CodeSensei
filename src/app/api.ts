@@ -12,7 +12,6 @@ interface EnhancedGenerateContentResponse {
   description: string;
 }
 
-
 const API = axios.create({
   baseURL: "https://emkc.org/api/v2/piston",
 });
@@ -21,7 +20,22 @@ const genAI = new GoogleGenerativeAI(
   process.env.NEXT_PUBLIC_GENAI_API_KEY || ""
 );
 
-const interestArray = ["spiderman", "batman and joker", "suicide squad", "doraemon", "attack on titans"];
+let interestArray: Array<string> = [];
+
+const fetchTopics = async () => {
+  try {
+    const response = await fetch('/interests/topic');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    interestArray = await response.json();
+    console.log('Fetched topics:', interestArray);
+  } catch (error) {
+    console.error('Error fetching topics:', error);
+  }
+};
+
+// const interestArray = ["spiderman", "batman and joker", "suicide squad", "doraemon", "attack on titans"];
 
 const getRandomValue = (array: Array<string>) => {
   const randomIndex = Math.floor(Math.random() * array.length);
@@ -124,6 +138,10 @@ export const getNextQuestion = async () => {
     // Handle popular question scenario
   } else {
     const qid = generateUniqueId();
+    await fetchTopics();
+    if(interestArray.length === 0) {
+      interestArray = ["spiderman", "batman and joker", "suicide squad", "doraemon", "attack on titans"];
+    }
     const interest = getRandomValue(interestArray);
     const questionData = await newQuestion(interest);
 
