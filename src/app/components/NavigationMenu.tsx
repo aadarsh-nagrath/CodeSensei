@@ -1,6 +1,7 @@
 import React from 'react'
 import GenereDialog from './GenereDialog';
 import MenuBar from './MenuBar';
+import Image from 'next/image';
 
 const NavigationMenu = () => {
   return (
@@ -8,7 +9,7 @@ const NavigationMenu = () => {
     <div className="flex-1 flex flex-row items-center justify-between py-0 px-8 box-border gap-[20px] max-w-full">
       <div className="w-[487px] flex flex-row items-center justify-start gap-[32px] max-w-full mq725:hidden mq725:gap-[16px]">
         <div className="flex flex-row items-center justify-start py-2.5 px-0 gap-[12px] text-base text-white">
-          <img
+          <Image
             className="h-[23.2px] w-5 relative"
             loading="lazy"
             alt=""

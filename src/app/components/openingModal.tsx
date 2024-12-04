@@ -127,8 +127,8 @@ const CustomDialog = ({
                 <CardHeader>
                   <CardTitle>Log In / Create Account</CardTitle>
                   <CardDescription>
-                    Login or Register here. Click "Create/Login" when you're
-                    done.
+                  Login or Register here. Click &quot;Create/Login&quot; when you&apos;re
+                  done.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
