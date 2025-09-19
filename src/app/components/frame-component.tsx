@@ -2,6 +2,7 @@
 
 import type { NextPage } from "next";
 import Feature from "./feature";
+import ProfileDrawer from "./ProfileDrawer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -31,6 +32,8 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
                 loading="lazy"
                 alt=""
                 src="/logo.svg"
+                width={20}
+                height={23}
               />
               <a className="[text-decoration:none] relative leading-[28px] font-medium text-[inherit] inline-block min-w-[63px] whitespace-nowrap">
                 CodeSensei
@@ -53,6 +56,10 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
             </a>
           </div>
 
+          {/* Profile Button */}
+          <div className='flex items-center'>
+            <ProfileDrawer />
+          </div>
 
           {/* LOGIN BUTTONS */}
 
@@ -88,13 +95,15 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
           <b className="relative text-sm leading-[28px] font-semibold font-p-regular text-dark-primary-foreground text-left inline-block min-w-[78px]">
             Get started
           </b>
-          <Image className="h-2 w-1 relative" alt="" src="/vector.svg" />
+          <Image className="h-2 w-1 relative" alt="" src="/vector.svg" width={4} height={8} />
         </button>
         <Image
           className="w-[1024px] relative rounded max-h-full object-cover max-w-full"
           loading="lazy"
           alt=""
           src="/hero-image-1@2x.png"
+          width={1024}
+          height={600}
         />
         <div className=" h-[1000px] relative flex flex-col [background:radial-gradient(50%_50%_at_50%_50%,_rgba(39,_39,_42,_0.05),_#09090b)] items-center justify-start pt-24 px-5 pb-0 box-border gap-[104px] w-full">
           <div className="w-[960px] flex flex-col items-center justify-start gap-[48px] max-w-full">
@@ -135,6 +144,8 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
               loading="lazy"
               alt=""
               src="/hero-image-1-1@2x.png"
+              width={960}
+              height={415}
             />
           </div>
           <div className="w-[960px] flex flex-col items-center justify-start gap-[48px] max-w-full">
@@ -172,7 +183,7 @@ const FrameComponent: NextPage<FrameComponentType> = ({ className = "" }) => {
               <b className="relative text-sm leading-[28px] font-semibold font-p-regular text-dark-primary-foreground text-left inline-block min-w-[78px]">
                 Get started
               </b>
-              <Image className="h-2 w-1 relative" alt="" src="/vector-1.svg" />
+              <Image className="h-2 w-1 relative" alt="" src="/vector-1.svg" width={4} height={8} />
             </button>
           </div>
         </div>

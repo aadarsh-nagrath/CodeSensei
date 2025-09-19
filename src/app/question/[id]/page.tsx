@@ -3,10 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import CustomDialog from '../../components/openingModal';
 import CodeEditor from '../../components/codeEditor';
-import NavigationMenu from '../../components/NavigationMenu';
+import ProfileDrawer from '../../components/ProfileDrawer';
+import GenereDialog from '../../components/GenereDialog';
+import QuestionLoader from '../../components/QuestionLoader';
 import './page.css';
 import DisplayQuestion from '@/app/components/DisplayQuestion';
 import { getNextQuestion } from '@/app/api';
+import { isSessionValid } from '@/lib/session';
 
 const sampleData1: QuestionData = {
   "qname": "Spiderman's Web Swing Optimization",
@@ -68,6 +71,7 @@ interface QuestionData {
 const QuestionPage = () => {
   const [open, setOpen] = useState(false);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
+  const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
 
   useEffect(() => {
     const currentUrl = window.location.href;
@@ -76,10 +80,13 @@ const QuestionPage = () => {
     } else {
       const fetchData = async () => {
         try {
+          setIsLoadingQuestion(true);
           const { questionData } = await getNextQuestion() as { questionData: QuestionData };
           setQuestionData(questionData);
         } catch (error) {
           console.error("Error fetching question:", error);
+        } finally {
+          setIsLoadingQuestion(false);
         }
       };
       fetchData();
@@ -89,7 +96,10 @@ const QuestionPage = () => {
   useEffect(() => {
     const currentUrl = window.location.href;
     if (currentUrl === 'http://localhost:3000/question/1') {
-      setOpen(true);
+      // Check if user has a valid session
+      if (!isSessionValid()) {
+        setOpen(true);
+      }
     }
   }, []);
 
@@ -97,11 +107,29 @@ const QuestionPage = () => {
 
   return (
     <div>
-      <NavigationMenu />
       <CustomDialog open={open} onClose={handleClose} />
-      <div className="code-editor-container">
-        {questionData && <DisplayQuestion question={questionData} />}
-        <CodeEditor />
+      <QuestionLoader isVisible={isLoadingQuestion} />
+      
+      {/* Fixed Header with Profile Button */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-bold text-white">Code Sensei</h1>
+            <span className="text-sm text-gray-400">Practice Mode</span>
+            <GenereDialog />
+          </div>
+          <div className="flex items-center space-x-4">
+            <ProfileDrawer />
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content with Top Padding */}
+      <div className="pt-20">
+        <div className="code-editor-container">
+          {questionData && <DisplayQuestion question={questionData} />}
+          <CodeEditor />
+        </div>
       </div>
     </div>
   );

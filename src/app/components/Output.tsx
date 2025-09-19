@@ -14,6 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useRouter } from 'next/navigation';
+import QuestionLoader from './QuestionLoader';
 
 const Output = ({
   language,
@@ -25,6 +26,7 @@ const Output = ({
   const [output, setOutput] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
   const router = useRouter();
 
   const runcode = async () => {
@@ -56,27 +58,44 @@ const Output = ({
   };
 
   const ahead = async () => {
-    const nextQuestion = await getNextQuestion();
-    if (nextQuestion?.qid) {
-      router.push(`/question/${nextQuestion.qid}`);
-    } else {
-      toast("Unable to get the next question", {
+    try {
+      setIsGeneratingQuestion(true);
+      const nextQuestion = await getNextQuestion();
+      if (nextQuestion?.qid) {
+        router.push(`/question/${nextQuestion.qid}`);
+      } else {
+        toast("Unable to get the next question", {
+          description: "Please try again later.",
+          duration: 1500,
+        });
+      }
+    } catch (error) {
+      console.error("Error getting next question:", error);
+      toast("Error generating question", {
         description: "Please try again later.",
         duration: 1500,
       });
+    } finally {
+      setIsGeneratingQuestion(false);
     }
   };
 
   return (
     <div className="z-10">
+      <QuestionLoader isVisible={isGeneratingQuestion} />
       <Sheet>
         <SheetTrigger asChild>
           <Button className='' variant="destructive" style={{position: 'fixed', bottom: '20px', right: '10%', transform: 'translateX(-50%)'}} onClick={runcode} disabled={isLoading}>
             {isLoading ? "Running..." : "Run Code"}
           </Button>
         </SheetTrigger>
-        <Button style={{position: 'fixed', bottom: '20px', right: '5%', transform: 'translateX(-50%)'}} variant="green" onClick={ahead}>
-          NEXT
+        <Button 
+          style={{position: 'fixed', bottom: '20px', right: '5%', transform: 'translateX(-50%)'}} 
+          variant="green" 
+          onClick={ahead}
+          disabled={isGeneratingQuestion}
+        >
+          {isGeneratingQuestion ? "Generating..." : "NEXT"}
         </Button>
         <SheetContent side={'left'} className="w-[50%] sm:w-[540px] bg-[#1e1e1e]">
           <SheetHeader>

@@ -1,6 +1,7 @@
 import React from 'react'
 import GenereDialog from './GenereDialog';
 import MenuBar from './MenuBar';
+import ProfileDrawer from './ProfileDrawer';
 import Image from 'next/image';
 
 const NavigationMenu = () => {
@@ -14,6 +15,8 @@ const NavigationMenu = () => {
             loading="lazy"
             alt=""
             src="/logo.svg"
+            width={20}
+            height={23}
           />
           <a className="[text-decoration:none] relative leading-[28px] font-medium text-[inherit] inline-block min-w-[63px] whitespace-nowrap">
             CodeSensei
@@ -22,7 +25,10 @@ const NavigationMenu = () => {
       <div className='absolute left-1/2 transform -translate-x-1/2'><MenuBar/></div>
       <div className='absolute left-[300px] ml-20'><GenereDialog /></div>
 
-
+      {/* Profile Button */}
+      <div className='absolute right-8 top-1/2 transform -translate-y-1/2'>
+        <ProfileDrawer />
+      </div>
 
       {/* LOGIN BUTTONS */}
 
