@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './DisplayQuestion.css';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { isSessionValid } from '@/lib/session';
 
 interface ExampleTestCase {
   input: any;
@@ -15,9 +19,101 @@ interface QuestionData {
 
 interface DisplayQuestionProps {
   question: QuestionData;
+  questionId?: string;
 }
 
-const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question }) => {
+const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question, questionId }) => {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const checkBookmarkStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/saved-questions/check?questionId=${questionId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setIsBookmarked(data.isBookmarked);
+      }
+    } catch (error) {
+      console.error('Error checking bookmark status:', error);
+    }
+  }, [questionId]);
+
+  // Check authentication status
+  useEffect(() => {
+    setIsAuthenticated(isSessionValid());
+  }, []);
+
+  // Check if question is already bookmarked
+  useEffect(() => {
+    if (questionId && isAuthenticated) {
+      checkBookmarkStatus();
+    }
+  }, [questionId, isAuthenticated, checkBookmarkStatus]);
+
+  const handleBookmark = async () => {
+    if (!isAuthenticated) {
+      toast("Authentication Required", {
+        description: "Please log in to save questions.",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!questionId) {
+      toast("Error", {
+        description: "Question ID not available.",
+        duration: 2000,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      console.log('Saving question:', { questionId, isBookmarked });
+      
+      const response = await fetch('/api/saved-questions', {
+        method: isBookmarked ? 'DELETE' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionId,
+          questionData: question,
+        }),
+      });
+
+      console.log('Response status:', response.status);
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Response data:', result);
+        
+        setIsBookmarked(!isBookmarked);
+        toast(
+          isBookmarked ? "Question Removed" : "Question Saved",
+          {
+            description: isBookmarked 
+              ? "Question removed from your saved questions." 
+              : "Question saved to your bookmarks!",
+            duration: 2000,
+          }
+        );
+      } else {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || 'Failed to save question');
+      }
+    } catch (error) {
+      console.error('Error saving question:', error);
+      toast("Error", {
+        description: `Failed to save question: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        duration: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Enhanced input rendering with better formatting
   const renderInput = (input: any, depth: number = 0): JSX.Element => {
     if (input === null || input === undefined) {
@@ -182,8 +278,29 @@ const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question }) => {
     <div className="question-container">
       {/* Header Section */}
       <div className="question-header">
-        <div className="question-icon">💻</div>
+        <div className="question-icon">𝐐</div>
         <h1 className="question-title">{question.qname}</h1>
+        <Button
+          onClick={handleBookmark}
+          disabled={isLoading}
+          variant="ghost"
+          size="icon"
+          className={`
+            ml-auto transition-all duration-200 hover:scale-110
+            ${isBookmarked 
+              ? 'text-yellow-500 hover:text-yellow-400' 
+              : 'text-gray-400 hover:text-yellow-500'
+            }
+            ${isLoading ? 'animate-pulse' : ''}
+          `}
+          title={isBookmarked ? 'Remove from bookmarks' : 'Add to bookmarks'}
+        >
+          {isBookmarked ? (
+            <BookmarkCheck className="w-5 h-5" />
+          ) : (
+            <Bookmark className="w-5 h-5" />
+          )}
+        </Button>
       </div>
 
       {/* Description Section */}

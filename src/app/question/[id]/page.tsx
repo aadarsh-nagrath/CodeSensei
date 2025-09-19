@@ -6,6 +6,7 @@ import CodeEditor from '../../components/codeEditor';
 import ProfileDrawer from '../../components/ProfileDrawer';
 import GenereDialog from '../../components/GenereDialog';
 import QuestionLoader from '../../components/QuestionLoader';
+import SavedQuestions from '../../components/SavedQuestions';
 import './page.css';
 import DisplayQuestion from '@/app/components/DisplayQuestion';
 import { getNextQuestion } from '@/app/api';
@@ -69,6 +70,7 @@ const QuestionPage = () => {
   const [open, setOpen] = useState(false);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
+  const [questionId, setQuestionId] = useState<string>('');
 
   useEffect(() => {
     const currentUrl = window.location.href;
@@ -81,12 +83,13 @@ const QuestionPage = () => {
           
           // Extract question ID from URL
           const urlParts = currentUrl.split('/');
-          const questionId = urlParts[urlParts.length - 1];
+          const extractedQuestionId = urlParts[urlParts.length - 1];
+          setQuestionId(extractedQuestionId);
           
           // First try to fetch the specific question from database
-          if (questionId && questionId !== '1') {
+          if (extractedQuestionId && extractedQuestionId !== '1') {
             try {
-              const response = await fetch(`/api/question?qid=${questionId}`);
+              const response = await fetch(`/api/question?qid=${extractedQuestionId}`);
               if (response.ok) {
                 const questionData = await response.json();
                 setQuestionData(questionData);
@@ -137,6 +140,7 @@ const QuestionPage = () => {
             <GenereDialog />
           </div>
           <div className="flex items-center space-x-4">
+            <SavedQuestions />
             <ProfileDrawer />
           </div>
         </div>
@@ -145,7 +149,7 @@ const QuestionPage = () => {
       {/* Main Content with Top Padding */}
       <div className="pt-20">
         <div className="code-editor-container">
-          {questionData && <DisplayQuestion question={questionData} />}
+          {questionData && <DisplayQuestion question={questionData} questionId={questionId} />}
           <CodeEditor />
         </div>
       </div>

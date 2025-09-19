@@ -7,6 +7,7 @@ db.createCollection('questions');
 db.createCollection('sessions');
 db.createCollection('interests');
 db.createCollection('analytics');
+db.createCollection('saved_questions');
 
 // Create indexes for performance
 db.users.createIndex({ "username": 1 }, { unique: true });
@@ -30,5 +31,10 @@ db.interests.createIndex({ "freq": -1 });
 db.analytics.createIndex({ "userId": 1 });
 db.analytics.createIndex({ "timestamp": 1 });
 db.analytics.createIndex({ "type": 1 });
+
+db.saved_questions.createIndex({ "userId": 1 });
+db.saved_questions.createIndex({ "questionId": 1 });
+db.saved_questions.createIndex({ "savedAt": -1 });
+db.saved_questions.createIndex({ "userId": 1, "questionId": 1 }, { unique: true });
 
 print('Database initialized successfully!');
