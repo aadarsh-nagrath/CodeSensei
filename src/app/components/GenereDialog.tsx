@@ -10,19 +10,35 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {useState } from "react"
+import { useState } from "react"
+import { useRouter } from 'next/navigation'
+import { toast } from "sonner"
+import QuestionLoader from './QuestionLoader'
 
 const GenereDialog = () => {
   const [interest, setInterest] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
   const handleInterest = async () => {
+    if (!interest.trim()) {
+      toast.error("Please enter a topic of interest");
+      return;
+    }
+
     try {
-      console.log('Sending interest:', interest); // Log the interest being sent
+      setIsLoading(true);
+      setIsOpen(false); // Close dialog immediately
+      console.log('Sending interest:', interest);
+      
+      // First, save the interest to the database
       const res = await fetch('/interests/topic', {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
         },
-        body: JSON.stringify({ interest }),
+        body: JSON.stringify({ interest: interest.trim() }),
       });
   
       if (!res.ok) {
@@ -33,14 +49,54 @@ const GenereDialog = () => {
   
       const data = await res.json();
       console.log('Server response:', data);
+
+      // Now generate a question with this specific interest
+      const questionRes = await fetch('/api/generate-question', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          topic: interest.trim(),
+          difficulty: 'medium' // Default difficulty
+        }),
+      });
+
+      if (!questionRes.ok) {
+        throw new Error('Failed to generate question');
+      }
+
+      const questionData = await questionRes.json();
+      console.log('Generated question:', questionData);
+
+      if (questionData.qid) {
+        toast.success(`Generating question about ${interest}...`);
+        setInterest(''); // Clear the input
+        router.push(`/question/${questionData.qid}`);
+      } else {
+        throw new Error('No question ID received');
+      }
+
     } catch (error) {
       console.error('Error in handleInterest:', error);
+      toast.error("Failed to generate question. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
   
 
+  const handleDialogChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open && isLoading) {
+      // If dialog is closed while loading, reset loading state
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
+      <QuestionLoader isVisible={isLoading} />
       <DialogTrigger asChild>
         <Button variant="outline">Choose Interest</Button>
       </DialogTrigger>
@@ -69,7 +125,13 @@ const GenereDialog = () => {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleInterest} type="submit">Go for it</Button>
+          <Button 
+            onClick={handleInterest} 
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Generating..." : "Go for it"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
