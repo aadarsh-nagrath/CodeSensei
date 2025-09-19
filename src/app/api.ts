@@ -120,33 +120,44 @@ async function newQuestion(topic: string, difficulty: string = 'medium') {
 }
 
 
-// Fallback questions in case AI generation fails
+// Fun, engaging fallback questions in case AI generation fails
 const fallbackQuestions = [
   {
-    qname: "Array Sum Problem",
-    description: "Given an array of integers, find the sum of all elements. This is a basic array manipulation problem.",
-    constraints: ["1 <= array.length <= 1000", "-1000 <= array[i] <= 1000"],
+    qname: "Superhero Power Ranking",
+    description: "In the superhero universe, different heroes have unique power levels. You need to create a ranking system that can efficiently find the top K most powerful heroes and handle dynamic updates when power levels change. Given an array of power levels and a value K, find the Kth largest power level. This is a classic heap problem!",
+    constraints: [
+      "1 <= power_levels.length <= 10^5",
+      "1 <= K <= power_levels.length",
+      "1 <= power_levels[i] <= 10^9"
+    ],
     example_test_cases: [
-      { input: { array: [1, 2, 3, 4, 5] }, output: 15 },
-      { input: { array: [-1, 0, 1] }, output: 0 }
+      { input: { power_levels: [10, 5, 15, 20, 8], k: 3 }, output: 10 },
+      { input: { power_levels: [100, 50, 75, 25], k: 2 }, output: 75 }
     ]
   },
   {
-    qname: "String Palindrome Check",
-    description: "Given a string, determine if it is a palindrome. A palindrome reads the same forwards and backwards.",
-    constraints: ["1 <= string.length <= 1000", "Only lowercase letters"],
+    qname: "Pokemon Battle Strategy",
+    description: "You're a Pokemon trainer preparing for a tournament. You have N Pokemon with different strengths, and you need to arrange them in a line such that the sum of strengths of adjacent Pokemon is maximized. This is a dynamic programming problem where you need to find the maximum sum of non-adjacent elements.",
+    constraints: [
+      "1 <= pokemon.length <= 10^4",
+      "1 <= pokemon[i] <= 10^6"
+    ],
     example_test_cases: [
-      { input: { string: "racecar" }, output: true },
-      { input: { string: "hello" }, output: false }
+      { input: { pokemon: [2, 7, 9, 3, 1] }, output: 12 },
+      { input: { pokemon: [1, 2, 3, 1] }, output: 4 }
     ]
   },
   {
-    qname: "Two Sum Problem",
-    description: "Given an array of integers and a target sum, find two numbers that add up to the target.",
-    constraints: ["2 <= array.length <= 1000", "-1000 <= array[i] <= 1000", "Only one valid solution exists"],
+    qname: "Adventure Quest Path",
+    description: "You're on an adventure quest and need to find the shortest path between two locations. Given a graph where each node represents a location and edges represent connections with travel costs, find the minimum cost to travel from the starting location to the destination. This is a classic shortest path problem using Dijkstra's algorithm.",
+    constraints: [
+      "1 <= n <= 1000",
+      "0 <= edges.length <= 10^4",
+      "1 <= cost <= 1000"
+    ],
     example_test_cases: [
-      { input: { array: [2, 7, 11, 15], target: 9 }, output: [0, 1] },
-      { input: { array: [3, 2, 4], target: 6 }, output: [1, 2] }
+      { input: { n: 4, edges: [[0,1,1],[1,2,3],[2,3,1],[0,3,4]], start: 0, end: 3 }, output: 4 },
+      { input: { n: 3, edges: [[0,1,2],[1,2,1],[0,2,4]], start: 0, end: 2 }, output: 3 }
     ]
   }
 ];
@@ -191,14 +202,26 @@ export const getNextQuestion = async () => {
           await cacheService.setQuestion(qid, questionData, 3600);
         }
         
-        // POST the generated question data to `/question/${qid}`
+        // Save the question to database
         try {
-          await axios.post(`/question/${qid}`, questionData);
-          console.log("Successfully posted question:", questionData.qname);
+          const saveRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/question`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ qid, questionData }),
+          });
+
+          if (saveRes.ok) {
+            console.log("Successfully saved question:", questionData.qname);
+          } else {
+            console.error("Failed to save question to database");
+          }
+          
           return { qid, questionData };
         } catch (error) {
-          console.error("Error posting question data:", error);
-          // Even if posting fails, return the question data
+          console.error("Error saving question data:", error);
+          // Even if saving fails, return the question data
           return { qid, questionData };
         }
       }

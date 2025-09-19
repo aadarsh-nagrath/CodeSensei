@@ -57,14 +57,11 @@ const sampleData1: QuestionData = {
 interface QuestionData {
   qname: string;
   description: string;
-  constraints?: { [key: string]: string };
-  example_test_cases: {
-    input: {
-      heights: number[];
-      max_jump_height: number;
-    };
-    output: number;
-  }[];
+  constraints?: string[] | { [key: string]: string };
+  example_test_cases: Array<{
+    input: any;
+    output: any;
+  }>;
 }
 
 
@@ -81,6 +78,27 @@ const QuestionPage = () => {
       const fetchData = async () => {
         try {
           setIsLoadingQuestion(true);
+          
+          // Extract question ID from URL
+          const urlParts = currentUrl.split('/');
+          const questionId = urlParts[urlParts.length - 1];
+          
+          // First try to fetch the specific question from database
+          if (questionId && questionId !== '1') {
+            try {
+              const response = await fetch(`/api/question?qid=${questionId}`);
+              if (response.ok) {
+                const questionData = await response.json();
+                setQuestionData(questionData);
+                setIsLoadingQuestion(false);
+                return;
+              }
+            } catch (error) {
+              console.log("Question not found in database, generating new one");
+            }
+          }
+          
+          // If specific question not found, generate a new one
           const { questionData } = await getNextQuestion() as { questionData: QuestionData };
           setQuestionData(questionData);
         } catch (error) {
