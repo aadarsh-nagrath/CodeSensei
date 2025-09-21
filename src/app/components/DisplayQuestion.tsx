@@ -4,6 +4,7 @@ import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { isSessionValid } from '@/lib/session';
+import { useLoginModal } from '@/lib/login-modal-context';
 
 interface ExampleTestCase {
   input: any;
@@ -26,6 +27,7 @@ const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question, questionId 
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { openLoginModal } = useLoginModal();
 
   const checkBookmarkStatus = useCallback(async () => {
     try {
@@ -56,6 +58,12 @@ const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question, questionId 
       toast("Authentication Required", {
         description: "Please log in to save questions.",
         duration: 3000,
+        action: {
+          label: "Login",
+          onClick: () => {
+            openLoginModal();
+          }
+        }
       });
       return;
     }

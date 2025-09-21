@@ -16,6 +16,7 @@ import {
 import { useRouter } from 'next/navigation';
 import QuestionLoader from './QuestionLoader';
 import { isSessionValid } from '@/lib/session';
+import { useLoginModal } from '@/lib/login-modal-context';
 import { Play, ChevronRight, Terminal, AlertCircle, CheckCircle, Loader2, Code2, Zap } from 'lucide-react';
 
 const Output = ({
@@ -33,6 +34,7 @@ const Output = ({
   const [executionTime, setExecutionTime] = useState<number>(0);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const router = useRouter();
+  const { openLoginModal } = useLoginModal();
 
   // Check authentication status
   useEffect(() => {
@@ -48,8 +50,7 @@ const Output = ({
         action: {
           label: "Login",
           onClick: () => {
-            // You can add login modal trigger here
-            console.log("Login required");
+            openLoginModal();
           }
         }
       });
@@ -111,8 +112,7 @@ const Output = ({
         action: {
           label: "Login",
           onClick: () => {
-            // You can add login modal trigger here
-            console.log("Login required");
+            openLoginModal();
           }
         }
       });
