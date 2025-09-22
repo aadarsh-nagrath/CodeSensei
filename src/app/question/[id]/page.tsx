@@ -7,6 +7,8 @@ import ProfileDrawer from '../../components/ProfileDrawer';
 import GenereDialog from '../../components/GenereDialog';
 import QuestionLoader from '../../components/QuestionLoader';
 import SavedQuestions from '../../components/SavedQuestions';
+import MarkSolvedButton from '../../components/MarkSolvedButton';
+import AnswerButton from '../../components/AnswerButton';
 import './page.css';
 import DisplayQuestion from '@/app/components/DisplayQuestion';
 import { getNextQuestion } from '@/app/api';
@@ -71,6 +73,7 @@ const QuestionPage = () => {
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
   const [questionId, setQuestionId] = useState<string>('');
+  const [currentLanguage, setCurrentLanguage] = useState<string>('java');
 
   useEffect(() => {
     const currentUrl = window.location.href;
@@ -140,6 +143,12 @@ const QuestionPage = () => {
             <GenereDialog />
           </div>
           <div className="flex items-center space-x-4">
+            {questionData && questionId && (
+              <AnswerButton questionId={questionId} currentLanguage={currentLanguage} />
+            )}
+            {questionData && questionId && (
+              <MarkSolvedButton questionId={questionId} />
+            )}
             <SavedQuestions />
             <ProfileDrawer />
           </div>
@@ -150,7 +159,7 @@ const QuestionPage = () => {
       <div className="pt-20">
         <div className="code-editor-container">
           {questionData && <DisplayQuestion question={questionData} questionId={questionId} />}
-          <CodeEditor />
+          <CodeEditor language={currentLanguage} onLanguageChange={setCurrentLanguage} />
         </div>
       </div>
     </div>

@@ -220,7 +220,7 @@ const Output = ({
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent 
           side="left" 
-          className="w-[60%] sm:w-[600px] bg-gradient-to-br from-gray-900 via-gray-800 to-black border-l border-gray-700"
+          className="w-[85%] sm:w-[90%] md:w-[85%] lg:w-[80%] xl:w-[75%] bg-gradient-to-br from-gray-900 via-gray-800 to-black border-l border-gray-700"
         >
           <SheetHeader className="space-y-4">
             <div className="flex items-center gap-3">

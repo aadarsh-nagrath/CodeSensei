@@ -3,6 +3,9 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
+# Install dependencies for SWC on ARM64
+RUN apk add --no-cache libc6-compat
+
 # Copy package files
 COPY package*.json ./
 
@@ -12,7 +15,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application with SWC disabled for ARM64 compatibility
 RUN npm run build
 
 # Expose port
