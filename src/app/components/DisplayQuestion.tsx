@@ -323,11 +323,11 @@ const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question, questionId 
       {/* Constraints Section */}
       {renderConstraints(question.constraints)}
 
-      {/* Test Cases Section */}
+      {/* Test Cases Section (hide expected outputs) */}
       <div className="test-cases-section">
         <div className="section-header">
           <div className="section-icon">🧪</div>
-          <h3 className="section-title">Example Test Cases</h3>
+          <h3 className="section-title">Example Inputs</h3>
         </div>
         <div className="test-cases-grid">
           {question.example_test_cases.map((testCase, index) => (
@@ -345,16 +345,6 @@ const DisplayQuestion: React.FC<DisplayQuestionProps> = ({ question, questionId 
                   </div>
                   <div className="input-container">
                     {renderInput(testCase.input)}
-                  </div>
-                </div>
-                
-                <div className="output-section">
-                  <div className="output-label">
-                    <span className="output-icon">📤</span>
-                    Output
-                  </div>
-                  <div className="output-container">
-                    {renderOutput(testCase.output)}
                   </div>
                 </div>
               </div>

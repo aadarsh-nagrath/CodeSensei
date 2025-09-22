@@ -22,6 +22,7 @@ interface AnswerModalProps {
   answerData: {
     approach: string;
     solution: string;
+    executableSolution?: string;
     timeComplexity: string;
     spaceComplexity: string;
     explanation: string;
@@ -42,6 +43,16 @@ const AnswerModal: React.FC<AnswerModalProps> = ({
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copied to clipboard!`);
+  };
+
+  const copyExecutableToEditor = () => {
+    if (answerData.executableSolution) {
+      // This will copy the executable solution to the code editor
+      // In a real implementation, you'd want to communicate with the parent component
+      // to update the code editor content
+      copyToClipboard(answerData.executableSolution, 'Executable solution');
+      toast.success('Executable solution copied! You can now paste it in the code editor and run it.');
+    }
   };
 
   const getLanguageIcon = (lang: string) => {
@@ -133,6 +144,37 @@ const AnswerModal: React.FC<AnswerModalProps> = ({
             </div>
           )}
 
+          {/* Executable Solution */}
+          {answerData.executableSolution && (
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-purple-400 flex items-center space-x-2">
+                  <ExternalLink className="w-5 h-5" />
+                  <span>Executable Version (with Test Cases)</span>
+                </h3>
+                <Button
+                  onClick={copyExecutableToEditor}
+                  variant="outline"
+                  size="sm"
+                  className="text-purple-400 hover:text-white border-purple-600 hover:border-purple-500"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy & Run
+                </Button>
+              </div>
+              <div className="relative">
+                <pre className="bg-gray-900/80 rounded-xl p-4 overflow-x-auto text-sm text-gray-100 border border-gray-700/50 max-h-96">
+                  <code className={`language-${language.toLowerCase()}`}>
+                    {answerData.executableSolution}
+                  </code>
+                </pre>
+              </div>
+              <p className="text-xs text-gray-400 mt-2 flex items-center">
+                💡 This version includes a main method and test cases. Copy it to the code editor and click &quot;Run Code&quot; to see the output!
+              </p>
+            </div>
+          )}
+
           {/* Complexity Analysis */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/20">
@@ -210,6 +252,15 @@ const AnswerModal: React.FC<AnswerModalProps> = ({
               <Copy className="w-4 h-4 mr-2" />
               Copy Solution
             </Button>
+            {answerData.executableSolution && (
+              <Button
+                onClick={copyExecutableToEditor}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-200 hover:scale-105 shadow-lg"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Copy & Run
+              </Button>
+            )}
             {isCached && (
               <Button
                 onClick={() => {
