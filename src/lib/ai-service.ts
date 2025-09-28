@@ -29,11 +29,32 @@ class AIService {
         
         const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         
-        const prompt = `Generate a ${difficulty} DSA question about ${topic}. 
-        Return JSON format: {qname, description, constraints, example_test_cases}
-        Make it innovative and never created before, similar to LeetCode style.
-        Include 2 example test cases with proper input/output format.
-        Ensure the JSON is valid and complete.`;
+        const prompt = `Create an engaging DSA coding problem that incorporates "${topic}" as a central theme. Make it FUN and relatable!
+
+        The problem should:
+        - Have a creative storyline involving ${topic}
+        - Be a real DSA problem (arrays, strings, trees, graphs, etc.) disguised in an engaging scenario
+        - Make learning DSA enjoyable through ${topic} context
+        - Include specific ${topic} elements in the problem description
+        - Be challenging but solvable
+
+        Examples of good themes:
+        - If topic is "Thor": "Thor's Hammer Distribution", "Asgardian Army Formation", "Mjolnir Power Levels"
+        - If topic is "Pokemon": "Pokemon Battle Strategy", "Gym Leader Challenge", "Pokemon Evolution Tree"
+        - If topic is "Marvel": "Avengers Team Formation", "Infinity Stone Collection", "Superhero Power Rankings"
+
+        Return ONLY valid JSON in this exact format:
+        {
+          "qname": "Creative title involving ${topic}",
+          "description": "Engaging story with ${topic} + clear DSA problem statement",
+          "constraints": ["constraint1", "constraint2", "constraint3"],
+          "example_test_cases": [
+            {"input": {"param1": value1, "param2": value2}, "output": expected_output},
+            {"input": {"param1": value3, "param2": value4}, "output": expected_output2}
+          ]
+        }
+
+        Make it creative, fun, and educational!`;
 
         const result = await model.generateContent(prompt);
         
@@ -86,4 +107,5 @@ class AIService {
   }
 }
 
-export default new AIService();
+const aiService = new AIService();
+export default aiService;

@@ -99,6 +99,7 @@ const CustomDialog = ({
           setErrorType('success');
           setTimeout(() => {
             onClose();
+            window.location.reload();
           }, 2000);
         } else {
           // Existing user logged in
@@ -106,6 +107,7 @@ const CustomDialog = ({
           setErrorType('success');
           setTimeout(() => {
             onClose();
+            window.location.reload();
           }, 1500);
         }
       } else {

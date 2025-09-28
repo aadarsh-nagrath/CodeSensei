@@ -39,30 +39,44 @@ export async function POST(request: NextRequest) {
         let questionData = await aiService.generateQuestion(trimmedTopic, difficulty);
 
         if (!questionData) {
-          // Fallback questions for specific topics
+          // Fun, engaging fallback questions for specific topics
           const fallbackQuestions = [
             {
-              qname: `${trimmedTopic} Array Challenge`,
-              description: `Given an array related to ${trimmedTopic}, implement a function that processes the data efficiently. The function should handle edge cases and optimize for performance.`,
+              qname: `${trimmedTopic} Power Ranking System`,
+              description: `In the world of ${trimmedTopic}, different characters have unique power levels. You need to create a ranking system that can efficiently find the top K most powerful characters and handle dynamic updates when power levels change. Given an array of power levels and a value K, find the Kth largest power level. This is a classic heap problem disguised in ${trimmedTopic} theme!`,
               constraints: [
-                "1 <= array.length <= 10^4",
-                "-10^9 <= array[i] <= 10^9"
+                "1 <= power_levels.length <= 10^5",
+                "1 <= K <= power_levels.length",
+                "1 <= power_levels[i] <= 10^9"
               ],
               example_test_cases: [
-                { input: { array: [1, 2, 3, 4, 5] }, output: 15 },
-                { input: { array: [10, 20, 30] }, output: 60 }
+                { input: { power_levels: [10, 5, 15, 20, 8], k: 3 }, output: 10 },
+                { input: { power_levels: [100, 50, 75, 25], k: 2 }, output: 75 }
               ]
             },
             {
-              qname: `${trimmedTopic} String Manipulation`,
-              description: `Working with ${trimmedTopic} themed strings, create a function that transforms the input according to the given requirements. Consider all possible edge cases.`,
+              qname: `${trimmedTopic} Battle Formation`,
+              description: `The ${trimmedTopic} army needs to form the most effective battle formation. You have N warriors with different strengths, and you need to arrange them in a line such that the sum of strengths of adjacent warriors is maximized. This is a dynamic programming problem where you need to find the maximum sum of non-adjacent elements.`,
               constraints: [
-                "1 <= string.length <= 1000",
-                "string contains only lowercase letters"
+                "1 <= warriors.length <= 10^4",
+                "1 <= warriors[i] <= 10^6"
               ],
               example_test_cases: [
-                { input: { str: "hello" }, output: "olleh" },
-                { input: { str: "world" }, output: "dlrow" }
+                { input: { warriors: [2, 7, 9, 3, 1] }, output: 12 },
+                { input: { warriors: [1, 2, 3, 1] }, output: 4 }
+              ]
+            },
+            {
+              qname: `${trimmedTopic} Quest Path Optimization`,
+              description: `You're on a quest in the ${trimmedTopic} universe and need to find the shortest path between two locations. Given a graph where each node represents a location and edges represent connections with travel costs, find the minimum cost to travel from the starting location to the destination. This is a classic shortest path problem using Dijkstra's algorithm.`,
+              constraints: [
+                "1 <= n <= 1000",
+                "0 <= edges.length <= 10^4",
+                "1 <= cost <= 1000"
+              ],
+              example_test_cases: [
+                { input: { n: 4, edges: [[0,1,1],[1,2,3],[2,3,1],[0,3,4]], start: 0, end: 3 }, output: 4 },
+                { input: { n: 3, edges: [[0,1,2],[1,2,1],[0,2,4]], start: 0, end: 2 }, output: 3 }
               ]
             }
           ];
@@ -77,14 +91,26 @@ export async function POST(request: NextRequest) {
             await cacheService.setQuestion(qid, questionData, 3600);
           }
           
-          // POST the generated question data to `/question/${qid}`
+          // Save the question to database
           try {
-            await axios.post(`/question/${qid}`, questionData);
-            console.log("Successfully posted question:", questionData.qname);
+            const saveRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/question`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ qid, questionData }),
+            });
+
+            if (saveRes.ok) {
+              console.log("Successfully saved question:", questionData.qname);
+            } else {
+              console.error("Failed to save question to database");
+            }
+            
             return NextResponse.json({ qid, questionData });
           } catch (error) {
-            console.error("Error posting question data:", error);
-            // Even if posting fails, return the question data
+            console.error("Error saving question data:", error);
+            // Even if saving fails, return the question data
             return NextResponse.json({ qid, questionData });
           }
         }

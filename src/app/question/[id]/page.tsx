@@ -6,6 +6,9 @@ import CodeEditor from '../../components/codeEditor';
 import ProfileDrawer from '../../components/ProfileDrawer';
 import GenereDialog from '../../components/GenereDialog';
 import QuestionLoader from '../../components/QuestionLoader';
+import SavedQuestions from '../../components/SavedQuestions';
+import MarkSolvedButton from '../../components/MarkSolvedButton';
+import AnswerButton from '../../components/AnswerButton';
 import './page.css';
 import DisplayQuestion from '@/app/components/DisplayQuestion';
 import { getNextQuestion } from '@/app/api';
@@ -57,14 +60,11 @@ const sampleData1: QuestionData = {
 interface QuestionData {
   qname: string;
   description: string;
-  constraints?: { [key: string]: string };
-  example_test_cases: {
-    input: {
-      heights: number[];
-      max_jump_height: number;
-    };
-    output: number;
-  }[];
+  constraints?: string[] | { [key: string]: string };
+  example_test_cases: Array<{
+    input: any;
+    output: any;
+  }>;
 }
 
 
@@ -72,6 +72,8 @@ const QuestionPage = () => {
   const [open, setOpen] = useState(false);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
+  const [questionId, setQuestionId] = useState<string>('');
+  const [currentLanguage, setCurrentLanguage] = useState<string>('java');
 
   useEffect(() => {
     const currentUrl = window.location.href;
@@ -81,6 +83,28 @@ const QuestionPage = () => {
       const fetchData = async () => {
         try {
           setIsLoadingQuestion(true);
+          
+          // Extract question ID from URL
+          const urlParts = currentUrl.split('/');
+          const extractedQuestionId = urlParts[urlParts.length - 1];
+          setQuestionId(extractedQuestionId);
+          
+          // First try to fetch the specific question from database
+          if (extractedQuestionId && extractedQuestionId !== '1') {
+            try {
+              const response = await fetch(`/api/question?qid=${extractedQuestionId}`);
+              if (response.ok) {
+                const questionData = await response.json();
+                setQuestionData(questionData);
+                setIsLoadingQuestion(false);
+                return;
+              }
+            } catch (error) {
+              console.log("Question not found in database, generating new one");
+            }
+          }
+          
+          // If specific question not found, generate a new one
           const { questionData } = await getNextQuestion() as { questionData: QuestionData };
           setQuestionData(questionData);
         } catch (error) {
@@ -119,6 +143,13 @@ const QuestionPage = () => {
             <GenereDialog />
           </div>
           <div className="flex items-center space-x-4">
+            {questionData && questionId && (
+              <AnswerButton questionId={questionId} currentLanguage={currentLanguage} />
+            )}
+            {questionData && questionId && (
+              <MarkSolvedButton questionId={questionId} />
+            )}
+            <SavedQuestions />
             <ProfileDrawer />
           </div>
         </div>
@@ -127,8 +158,8 @@ const QuestionPage = () => {
       {/* Main Content with Top Padding */}
       <div className="pt-20">
         <div className="code-editor-container">
-          {questionData && <DisplayQuestion question={questionData} />}
-          <CodeEditor />
+          {questionData && <DisplayQuestion question={questionData} questionId={questionId} />}
+          <CodeEditor language={currentLanguage} onLanguageChange={setCurrentLanguage} />
         </div>
       </div>
     </div>

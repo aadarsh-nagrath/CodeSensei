@@ -4,10 +4,14 @@ import LanguageSelector from './languageSelector';
 import { CODE_SNIPPETS } from '../constant';
 import Output from './Output';
 
-const CodeEditor = () => {
+interface CodeEditorProps {
+  language: string;
+  onLanguageChange: (language: string) => void;
+}
+
+const CodeEditor: React.FC<CodeEditorProps> = ({ language, onLanguageChange }) => {
   const editorRef = useRef(null);
   const [code, setCode] = useState("");
-  const [language, setLanguage] = useState("java");
 
   const editorOnMount = (editor: any) => {
     editorRef.current = editor;
@@ -15,7 +19,7 @@ const CodeEditor = () => {
   };
 
   const languageSelect = (selectedLanguage: string) => {
-    setLanguage(selectedLanguage);
+    onLanguageChange(selectedLanguage);
     setCode(CODE_SNIPPETS[selectedLanguage as keyof typeof CODE_SNIPPETS]);
   };
 
