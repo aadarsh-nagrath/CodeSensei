@@ -53,62 +53,31 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Prepare the prompt for AI (explicitly enforce EASY-level, accuracy, and validation against provided examples)
-    const prompt = `You are an expert programming tutor. Provide an EASY-level (simple and correct) solution for the following coding problem in ${language}. Prioritize clarity and correctness over cleverness.
+    // Prepare the prompt for AI (optimized for speed)
+    const prompt = `Solve this coding problem in ${language}:
 
-**Problem:**
-${question.qname}
+**Problem:** ${question.qname}
+**Description:** ${question.description}
+**Constraints:** ${question.constraints || 'None'}
 
-**Description:**
-${question.description}
-
-**Constraints:**
-${question.constraints || 'None specified'}
-
-**Example Test Cases (GROUND TRUTH - DO NOT CHANGE):**
+**Examples:**
 ${question.example_test_cases?.map((example: any, index: number) => 
-  `Example ${index + 1}:
-Input: ${JSON.stringify(example.input)}
-Output: ${JSON.stringify(example.output)}
-Explanation: ${example.explanation || 'N/A'}`
-).join('\n\n') || 'No examples provided'}
+  `Example ${index + 1}: Input: ${JSON.stringify(example.input)} → Output: ${JSON.stringify(example.output)}`
+).join('\n') || 'No examples'}
 
 **Requirements:**
-1. Provide a complete, working solution in ${language}, EASY-level and straightforward.
-2. STRICT: Treat the examples above as canonical ground truth. Do NOT invent, modify, or add test cases.
-3. Your solution MUST produce EXACTLY the expected outputs for ALL provided examples.
-4. Include detailed time and space complexity analysis.
-5. Explain the approach briefly and list key edge cases handled.
-6. Add minimal, helpful code comments.
-7. Make the code clean, readable, and runnable as-is.
-8. If any ambiguity exists, state assumptions clearly and align them with the examples.
+- Provide a complete, working solution in ${language}
+- Your solution must produce EXACTLY the expected outputs for ALL examples
+- Keep it simple and readable
+- Add brief comments
 
-**Response Format:**
-Please structure your response as follows:
-
-**Approach:**
-[Explain the algorithm and approach]
-
-**Solution:**
-\`\`\`${language}
-[Your complete code solution here]
-\`\`\`
-
+**Format your response as:**
+**Approach:** [Brief explanation]
+**Solution:** \`\`\`${language}\n[Your code]\n\`\`\`
 **Time Complexity:** O([complexity])
 **Space Complexity:** O([complexity])
-
-**Explanation:**
-[Detailed explanation of how the solution works]
-
-**Edge Cases:**
-[Discuss edge cases and how they're handled]
-
-**Alternative Approaches:**
-[If applicable, mention other possible solutions]
-
-NOTE:
-- Do not alter the examples. Ensure your solution, when executed against the examples, yields the exact expected outputs.
-- Prefer simple constructs and the most understandable algorithm that passes the examples.`;
+**Explanation:** [How it works]
+**Edge Cases:** [Key edge cases]`;
 
     // Check if Gemini API key is available
     if (!process.env.NEXT_PUBLIC_GENAI_API_KEY) {
@@ -123,7 +92,13 @@ NOTE:
 
     // Initialize Gemini AI
     const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GENAI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 2048,
+      }
+    });
 
     // Call Gemini AI to generate the answer
     const result = await model.generateContent(prompt);

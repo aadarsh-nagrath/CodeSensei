@@ -27,7 +27,13 @@ class AIService {
       try {
         console.log(`Generating question attempt ${attempt}/${maxRetries} for topic: ${topic}, difficulty: ${difficulty}`);
         
-        const model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = this.genAI.getGenerativeModel({ 
+          model: "gemini-2.0-flash",
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1024,
+          }
+        });
         
         const prompt = `Create an engaging DSA coding problem that incorporates "${topic}" as a central theme. Make it FUN and relatable!
 
@@ -54,7 +60,7 @@ class AIService {
           ]
         }
 
-        Make it creative, fun, and educational!`;
+Make it fun but keep it simple!`;
 
         const result = await model.generateContent(prompt);
         
